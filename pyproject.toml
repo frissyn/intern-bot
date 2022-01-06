@@ -2,14 +2,13 @@
 name = "intern"
 version = "0.1.0"
 description = ""
-authors = ["Your Name <you@example.com>"]
+authors = ["frissyn <<>>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-SQLAlchemy = "^1.4.29"
 nextcord = "^2.0.0-alpha.5"
-Flask = "^2.0.2"
 timeago = "^1.0.15"
+Flask = "^2.0.2"
 
 [tool.poetry.dev-dependencies]
 
