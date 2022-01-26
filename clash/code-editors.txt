@@ -1,0 +1,33 @@
+CODE EDITORS
+------------
+
+
+Players:
++ Atom
++ Emacs
++ Espresso (Mac)
++ Glitch
++ AWS Cloud 9
++ Microsoft Word
++ Nano
++ Notepad
++ Notepad++
++ JetBrains
++ Sublime Text
++ TextEdit (Mac)
++ TextMate
++ Vim
++ Visual Studio
++ Visual Studio Code
+
+
+Clashes:
+    Playoffs:
+        1. JetBrains         // Visual Studio Code
+        2. TextEdit (Mac)    // Notepad
+        3. Nano              // Vim
+        4. Espresso (Mac)    // Microsoft Word
+        5. Visual Studio     // Sublime Text
+        6. TextMate          // Notepad++
+        7. AWS Cloud 9       // Glitch
+        8. Atom              // Emacs

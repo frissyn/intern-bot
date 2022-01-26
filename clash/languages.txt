@@ -1,0 +1,47 @@
+PROGRAMMING LANGUAGES
+---------------------
+
+Players:
+1. Dart
+2. C
+3. Rust
+4. TypeScript
+5. Bash
+6. Swift
+7. C#
+8. JavaScript
+9. Lua
+10. Python
+11. Crystal
+12. Java
+13. Ruby
+14. Golang
+15. C++
+16. Brainf--k
+
+Clashes:
+    Playoffs:
+        1. Dart       // Brainf--k
+        2. Lua        // JavaScript
+        3. Bash       // Java
+        4. Ruby       // TypeScript
+        5. Rust       // Golang
+        6. Crystal    // Swift
+        7. C#         // Python
+        8. C++        // C
+    
+    Quarter-Finals:
+        1. Dart       // JavaScript
+        2. Java       // TypeScript
+        3. Rust       // Swift
+        4. Python     // C++
+    
+    Semi-Finals:
+        1. JavaScript // TypeScript
+        2. Rust       // Python
+    
+    Grand-Finals:
+        1. JavaScript // Python
+
+Winner:
+    JavaScript
