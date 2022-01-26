@@ -4,9 +4,6 @@ from source import robot
 
 @robot.event
 async def on_ready():
-    robot.remove_command("help")
-
-    await robot.change_presence(status=nextcord.Status.dnd)
-
     print(f"{robot.user.name} has connected to Discord.")
-    print(f"Current Event Loop: {robot.loop}")
+    print(f"Event Loop: {robot.loop.__name__}")
+    print(f"Event Loop Internal Time: {robot.loop.time()}")
