@@ -47,7 +47,8 @@ class ClashView(nextcord.ui.View):
             btn = nextcord.ui.Button(
                 label=player.name,
                 emoji=self.emotes[i],
-                style=nextcord.ButtonStyle.primary
+                style=nextcord.ButtonStyle.primary,
+                custom_id=f"persistent:p{i}r{self.rn.rnum}"
             )
 
             btn.callback = getattr(self, f"_{i}")

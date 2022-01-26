@@ -1,9 +1,7 @@
-import time
 import nextcord
 
 from ..cog import Base
 
-from .views import vote
 from .views import ClashView
 from .views import ArchivedClashView
 
@@ -13,7 +11,6 @@ from source import COLOR
 
 from nextcord.ext import commands
 
-from db.models import Vote
 from db.models import Round
 from db.models import Player
 from db.models import StaleView
@@ -35,9 +32,6 @@ class Clashes(Base):
                 t = session.query(Tournament).filter_by(title=value).first()
         
         return t
-    
-    async def vote(self, user, plyr, rn):
-        pass
 
 
     @commands.command("poll.new")
@@ -110,8 +104,10 @@ class Clashes(Base):
         em.description += "*Interaction failed? Ping <@495609014886072320> "
         em.description += "in <#616645516700155904> for a fix!*"
 
+        view = ClashView(t, rn)
+        m = await ctx.send(embed=em, view=view)
 
-        await ctx.send(embed=em, view=ClashView(t, rn))
+        self.bot.add_view(view, message_id=m.id)
         
     @commands.command(name="poll.kill")
     async def kill(self, ctx, *, msgs):
