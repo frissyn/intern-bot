@@ -1,0 +1,8 @@
+Please explain your question or issue with as much detail as possible. Only send *one message* to describe the problem, this will be used as the question body.
+
+**Remember to include the following:**
++ Relevant Code
++ All Errors (if any)
++ Expected Behavior
+
+*By continuing, you acknowledge that you have read and understand the help guidelines and server rules.*
