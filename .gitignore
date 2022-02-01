@@ -6,4 +6,6 @@ db/db/
 db/logs/
 db/json/
 
+node_modules/
 poetry.lock
+package-lock.json
