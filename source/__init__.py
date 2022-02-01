@@ -9,17 +9,14 @@ INTENTS = nextcord.Intents.all()
 
 robot = commands.Bot(command_prefix="%", intents=INTENTS)
 extensions = {
-    "events": [
-        "on_connect",
-        "on_ready"
-    ],
+    "events": ["on_ready"],
     "cogs": [
         "clashes",
         "dump",
         "sandbox",
-        "starboard",
+        "tickets",
         "utility"
-    ]
+    ],
 }
 
 

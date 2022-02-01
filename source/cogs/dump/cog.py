@@ -11,7 +11,6 @@ from source import COLOR
 from nextcord.ext import commands
 
 from db import session
-
 from db.models import Tag
 from db.models import DumpEntry
 from db.models import Attachment
@@ -22,7 +21,7 @@ class Dump(Base):
         self.bot = bot
         self.target = 928313138741399603
         self._ago = lambda x: timeago.format(x)
-    
+
     def _chunks(self, iterable, n, fill=None):
         args = [iter(iterable)] * n
 
@@ -37,11 +36,11 @@ class Dump(Base):
 
         em.set_footer(
             icon_url=self.bot.user.avatar.url,
-            text=f"Tossed into Dumpster {self._ago(entry.stamp)}"
+            text=f"Tossed into Dumpster {self._ago(entry.stamp)}",
         )
 
         return em
-    
+
     def _find(self, name: str):
         entries = session.query(DumpEntry).all()
 
@@ -52,7 +51,7 @@ class Dump(Base):
         for en in entries:
             if name in en.name:
                 return en
-        
+
         return None
 
     async def _files(self, msg, limit=1):
@@ -61,13 +60,12 @@ class Dump(Base):
         for atch in msg.attachments[:limit]:
             files.append(
                 nextcord.File(
-                    io.BytesIO(await atch.read()),
-                    spoiler=False, filename=atch.filename
+                    io.BytesIO(await atch.read()), spoiler=False, filename=atch.filename
                 )
             )
 
         return files
-    
+
     async def _new_entry(self, name, atch, tags):
         en = DumpEntry(name=name)
         tags = [Tag(name=t) for t in tags]
@@ -76,47 +74,49 @@ class Dump(Base):
         session.add(en)
         session.commit()
 
-        for tag in tags: 
+        for tag in tags:
             tag.entry_id = en.id
 
             session.add(tag)
-        
+
         atch.entry_id = en.id
 
         session.add(atch)
         session.commit()
 
         return en
-    
+
     @commands.command(name="dump.count", aliases=["dump.c"])
     async def count(self, ctx):
         c = session.query(DumpEntry).count()
 
         await ctx.send(f"There are currently {c} entries in the Dumpster.")
-    
+
     @commands.command(name="dump.add", aliases=["dump.a"])
     async def add(self, ctx, name, *, tags=""):
         target = self.bot.get_channel(self.target)
-        a = (await target.send(
-            files=await self._files(ctx.message, 1),
-            content=ctx.message.content.strip("%dump.add")
-        )).attachments[0]
+        a = (
+            await target.send(
+                files=await self._files(ctx.message, 1),
+                content=ctx.message.content.strip("%dump.add"),
+            )
+        ).attachments[0]
 
-        
         entry = await self._new_entry(name, a, tags.split(" "))
 
         await ctx.send(embed=self._embed_entry(entry))
         await ctx.message.delete()
-    
+
     @commands.command(name="quiet-add", aliases=["dump.qa"])
     async def qadd(self, ctx, name, *, tags=""):
         target = self.bot.get_channel(self.target)
-        a = (await target.send(
-            files=await self._files(ctx.message, 1),
-            content=ctx.message.content.replace("%dump.add", "")
-        )).attachments[0]
+        a = (
+            await target.send(
+                files=await self._files(ctx.message, 1),
+                content=ctx.message.content.replace("%dump.add", ""),
+            )
+        ).attachments[0]
 
-        
         await self._new_entry(name, a, tags.split(" "))
         await ctx.message.add_reaction("🟢")
 
@@ -126,7 +126,7 @@ class Dump(Base):
 
         if en:
             await ctx.send(embed=self._embed_entry(en))
-    
+
     @commands.command(name="dump.sdive", aliases=["dump.sd"])
     async def slient_search(self, ctx, name):
         en = self._find(name)
@@ -156,5 +156,5 @@ class Dump(Base):
         if len(entries) > 0:
             em.description += "\n\n"
             em.description += "\n".join(titles)
-        
+
         await ctx.send(embed=em)

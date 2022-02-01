@@ -12,19 +12,13 @@ from nextcord.ext import commands
 
 class Sandbox(Base):
     def _prep(self, code: str):
-        arr = (
-            code
-            .strip("```")
-            .replace("py\n", "")
-            .replace("python\n", "")
-            .split("\n")
-        )
+        arr = code.strip("```").replace("py\n", "").replace("python\n", "").split("\n")
 
         if not arr[::-1][0].replace(" ", "").startswith("return"):
             arr[len(arr) - 1] = "return " + arr[::-1][0]
-        
+
         return "".join(f"\n\t{i}" for i in arr)
-    
+
     def _resolve(self, var):
         if hasattr(var, "__iter__"):
             vlen = len(list(var))
@@ -33,7 +27,7 @@ class Sandbox(Base):
                 return f"<{type(var).__name__} iterable with >= 100 values ({vlen})>"
             elif not vlen:
                 return f"<An empty {type(var).__name__} iterable>"
-        
+
         if not var and not isinstance(var, bool):
             return f"<an empty {type(var).__name__} object>"
 
@@ -49,7 +43,7 @@ class Sandbox(Base):
             "nextcord": nextcord,
             "commands": commands,
             "sauce": inspect.getsource,
-            **dict([(n, getattr(sandbox, n)) for n in sandbox.names])
+            **dict([(n, getattr(sandbox, n)) for n in sandbox.names]),
         }
 
         exec(f"async def task(): {code}", args)

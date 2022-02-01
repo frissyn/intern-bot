@@ -6,17 +6,17 @@ text = lambda x: open(x, "r").read()
 result = lambda hl, data: res.format(hl=hl, data=data)
 
 
-def _line(file: str, lnum: int, hl: str="sql"):
+def _line(file: str, lnum: int, hl: str = "sql"):
     soup = text(file)
 
     for i, line in enumerate(soup.split("\n")):
         if i == int(lnum) - 1:
             return result(hl, line)
-    
-    return result(hl, "Error: NOT FOUND") 
+
+    return result(hl, "Error: NOT FOUND")
 
 
-def _from(file: str, keyword: str, last: int=None, hl: str="sql"):
+def _from(file: str, keyword: str, last: int = None, hl: str = "sql"):
     soup = text(file)
 
     if not last:
@@ -39,12 +39,6 @@ def _from(file: str, keyword: str, last: int=None, hl: str="sql"):
 
 
 SUBS = {
-    "line": {
-        "exec": _line,
-        "def": "_line(file, lnum, hl='sql')"
-    },
-    "from": {
-        "exec": _from,
-        "def": "_from(file, keyword, last=None, hl='sql')"
-    }
+    "line": {"exec": _line, "def": "_line(file, lnum, hl='sql')"},
+    "from": {"exec": _from, "def": "_from(file, keyword, last=None, hl='sql')"},
 }
