@@ -18,3 +18,16 @@ enLog.addHandler(handler)
 
 engine = sq.create_engine(DB_URI, echo=False)
 session = (orm.sessionmaker(engine))()
+
+
+class ModelMixin():
+    def update(self, **kwargs):
+        cols = []
+
+        for c in list(self.__table__.columns):
+            cols.append(str(c).replace(f"{self.__tablename__}", ""))
+        
+        for row, val in kwargs.items():
+            self.__setattr__(row, val)
+
+        session.commit()

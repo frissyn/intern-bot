@@ -1,4 +1,5 @@
 from db import Model
+from db import ModelMixin
 
 import sqlalchemy as sq
 
@@ -6,15 +7,34 @@ from sqlalchemy import orm
 
 from datetime import datetime as dt
 
+__all__ = [
+    "StaleView",
+    "ActiveView",
+    "Tournament",
+    "Round",
+    "Player",
+    "Vote"
+]
 
-class StaleView(Model):
+
+class StaleView(Model, ModelMixin):
     __tablename__ = "staleviews"
 
     id = sq.Column(sq.Integer, primary_key=True)
     msg_id = sq.Column(sq.Integer, nullable=False)
 
 
-class Tournament(Model):
+class ActiveView(Model, ModelMixin):
+    __tablename__ = "activeviews"
+
+    id = sq.Column(sq.Integer, primary_key=True)
+    code = sq.Column(sq.String, nullable=False)
+    msg_id = sq.Column(sq.Integer, nullable=False)
+    tourn_id = sq.Column(sq.Integer, nullable=False)
+    round_id = sq.Column(sq.Integer, nullable=False)
+
+
+class Tournament(Model, ModelMixin):
     __tablename__ = "tournaments"
 
     id = sq.Column(sq.Integer, primary_key=True)
@@ -26,7 +46,7 @@ class Tournament(Model):
     rounds = orm.relationship("Round", backref="tournament")
 
 
-class Round(Model):
+class Round(Model, ModelMixin):
     __tablename__ = "rounds"
 
     id = sq.Column(sq.Integer, primary_key=True)
@@ -37,7 +57,7 @@ class Round(Model):
     tourn_id = sq.Column(sq.Integer, sq.ForeignKey("tournaments.id"))
 
 
-class Player(Model):
+class Player(Model, ModelMixin):
     __tablename__ = "players"
 
     id = sq.Column(sq.Integer, primary_key=True)
@@ -47,7 +67,7 @@ class Player(Model):
     round_id = sq.Column(sq.Integer, sq.ForeignKey("rounds.id"))
 
 
-class Vote(Model):
+class Vote(Model, ModelMixin):
     __tablename__ = "votes"
 
     id = sq.Column(sq.Integer, primary_key=True)
