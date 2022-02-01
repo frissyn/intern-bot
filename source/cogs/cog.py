@@ -8,17 +8,17 @@ def _iter(i):
 
 
 def flat_check(iter, perms):
-    flat = [i.id  for i in iter]
+    flat = [i.id for i in iter]
 
     for item in flat:
         if flat in perms:
             return True
-    
+
     return False
 
 
 def load_perms_map(name: str):
-    path = f"source/cogs/{name.lower()}/perms.json"
+    path = f"source/cogs/{name.lower()}/config/perms.json"
 
     with open(path, "r+") as fh:
         return json.loads(fh.read())
@@ -34,16 +34,17 @@ class Base(commands.Cog):
 
         spec = perms.get(command.name)
         spec = spec if spec else perms["*"]
-        
-        if spec == "*": return True
+
+        if spec == "*":
+            return True
 
         if user.id in _iter(spec.get("members")):
             return True
-        
+
         if flat_check(ctx.author.roles[1:], _iter(spec.get("roles"))):
             return True
-        
+
         if flat_check(ctx.guild.channels, _iter(perms.get("channels"))):
             return True
 
-        return (await ctx.message.add_reaction(r"❌") and False)
+        return await ctx.message.add_reaction(r"❌") and False
