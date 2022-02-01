@@ -1,0 +1,10 @@
+{
+    "description": "",
+    "type": "utility",
+    "commands": {
+        "tickets.blacklist": {
+            "usage": "{cmd} {{user}}",
+            "brief": ""
+        }
+    }
+}

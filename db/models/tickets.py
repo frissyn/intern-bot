@@ -33,13 +33,16 @@ class Client(Model, ModelMixin):
 
     def bl_delta(self):
         return abs(self.blacklisted_until - dt.datetime.now())
+    
+    def force_last_used(self):
+        self.last_used = (dt.datetime.now() - dt.timedelta(minutes=20))
 
     def opened(self):
         self.last_used = dt.datetime.now()
 
     def can_open(self):
-        has_open = True in [t.resolved for t in self.tickets]
-        delta = (self.last_used - dt.datetime.now() >= dt.timedelta(minutes=15))
+        has_open = False in [t.resolved for t in self.tickets]
+        delta = (abs(dt.datetime.now() - self.last_used) >= dt.timedelta(minutes=15))
 
         if self.blacklisted:
             return False, "You have been blacklisted from opening tickets."
@@ -50,7 +53,7 @@ class Client(Model, ModelMixin):
         if has_open:
             return False, "You already have a thread open. Please resolve that one first."
 
-        return True
+        return True, None
 
 
 class Ticket(Model, ModelMixin):
@@ -70,6 +73,13 @@ class Ticket(Model, ModelMixin):
 
     contexts = orm.relationship("Context", backref="ticket")
     client_id = sq.Column(sq.Integer, sq.ForeignKey("clients.id"))
+
+    def f_id(self):
+        return str(self.id).zfill(4)
+
+    def resolve(self):
+        self.resolved = True
+        self.resolved_at = dt.datetime.now()
 
 
 class Context(Model, ModelMixin):

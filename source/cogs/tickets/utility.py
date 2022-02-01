@@ -7,7 +7,7 @@ from db.models import Context
 from db.utility import commit
 
 
-TARGET = 936666793374785536
+TARGET = 938094149222158376
 ROLES = [
     {"value": "help-bash", "default": False, "label": "Bash"},
     {"value": "help-basic-lang", "default": False, "label": "Basic (Lang)"},
@@ -25,7 +25,7 @@ ROLES = [
     {"value": "help-python", "default": False, "label": "Python"},
     {"value": "help-ruby", "default": False, "label": "Ruby"},
     {"value": "help-rust", "default": False, "label": "Rust"},
-    {"value": "help-swift", "default": False, "label": "Swift"},
+    {"value": "help-swift", "default": False, "label": "Swift"}
 ]
 
 

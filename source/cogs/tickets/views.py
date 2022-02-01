@@ -2,8 +2,6 @@ import re
 import asyncio
 import nextcord
 
-from os import path
-
 from nextcord import ui
 
 from source import COLOR
@@ -46,26 +44,27 @@ class HelpBoard(ui.View):
         if not can_open:
             return await res.send_message(reason, ephemeral=True)
         else:
-            commit(client.opened())
+            client.opened()
+            session.commit()
 
         target = self.bot.get_channel(self.target)
         thread = await target.create_thread(
-            type=None,
             auto_archive_duration=1440,
-            name=f"ticket-{inter.user.name}{inter.user.discriminator}",
-            reason=f"Auto-created thread for help ticket from {inter.user.name}",
+            name=f"ticket-{inter.user.name}",
+            type=nextcord.ChannelType.private_thread,
+            reason=f"Auto-created thread for {btn.label} ticket from {inter.user.name}"
         )
 
         ticket = commit(
             Ticket(body=None, type_=btn.label, client_id=client.id, thread_id=thread.id)
         )[0]
 
-        await thread.edit(name=f"{thread.name}-{ticket.id}")
+        await thread.edit(name=f"{thread.name} | {ticket.f_id()}")
 
         c = file_content("thread")
         check = lambda m: m.author.id == inter.user.id
         em = nextcord.Embed(title=f"{btn.label} Thread", description=c, color=COLOR)
-        em.set_footer(text=f"Ticket ID: {ticket.id} | Opened: {ticket.stamp}")
+        em.set_footer(text=f"Ticket ID: {ticket.f_id()} | Opened: {ticket.stamp}")
 
         await thread.add_user(inter.user); await thread.send(embed=em)
 
@@ -87,22 +86,27 @@ class HelpBoard(ui.View):
 
         session.commit()
 
-        await thread.send(
-            "Got it! Please select all the categories "
-            "that apply to your question. (No more than 3)",
-            view=CategoryDropdownView(ticket, self)
-        )
+        if btn.label != "Replit Help":
+            await thread.send(
+                "Got it! Please select all the categories "
+                "that apply to your question. (No more than 3)",
+                view=CategoryDropdownView(ticket, self)
+            )
+        else:
+            await self.handoff(ticket, [], inter)
     
     async def handoff(self, ticket, rnames, inter):
         target = self.bot.get_channel(self.target)
         thread = self.bot.get_channel(ticket.thread_id)
+        
         roles = [r for r in thread.guild.roles if r.name in rnames]
-
+        cats = [r.replace("help-", "") for r in rnames]
 
         em = nextcord.Embed(color=COLOR)
-        em.title=f"**New Help Request**: {inter.user.mention}"
-        em.description = f"**Body**: \"{ticket.body[:240]}...\"\n"
-        em.description += f"**Categories**: {' '.join(rnames)}\n\n"
+        em.title=f"**New {ticket.type_} Request!**"
+        em.description = f"<@{inter.user.id}> asks, "
+        em.description += f"\"{ticket.body[:240]}...\"\n"
+        em.description += f"**Categories**: {' '.join(cats)}\n\n"
         em.description += f"**0** users are currently in this help thread."
         em.set_footer(text=f"Ticket ID: {ticket.id} | Opened: {ticket.stamp}")
 
@@ -113,17 +117,16 @@ class HelpBoard(ui.View):
             view=JoinThreadView(ticket, self.bot)
         )
 
-        ticket.notice_id = m.id
-        commit(ticket)
+        ticket.update(notice_id=m.id)
+        session.commit()
 
         await thread.edit(locked=False)
+        await inter.message.delete()
         await thread.send(
             "Your ticket has been saved. Help will join the thread soon! "
             "Once you have recieved satisfactory help, use `%tickets.resolve` "
             "so I know to archive the thread and mark your question as resolved."
         )
-
-        await inter.message.delete()
 
 
 class CategoryDropdownView(ui.View):
@@ -166,25 +169,15 @@ class JoinThreadView(ui.View):
         self.add_item(btn)
     
     async def callback(self, inter):
-        target = self.bot.get_channel(TARGET)
         thread = self.bot.get_channel(self.ticket.thread_id)
 
         await thread.add_user(inter.user)
-
-        m = await target.fetch_message(self.ticket.notice_id)
-
-        em = m.embeds[0]
-        num = re.findall(r"\d+", em.description)[0]
-
-        em.description = em.description.replace(num, str(int(num) + 1))
-
-        await m.edit(embed=em)
 
 
 class ResolvedThreadView(nextcord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    @nextcord.ui.button(label="Thread is resolved.", disabled=True)
+    @nextcord.ui.button(label="Thread has been resolved", emoji=r"🔒", disabled=True)
     async def button(self, *args):
         pass
