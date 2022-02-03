@@ -1,12 +1,12 @@
 Welcome to the Replit Help Hub, where you can find help with your various questions, and share your knowledge with others! We have three different areas of help requests.
 
-💳 **Code Help~~**
+💳 **Code Help~~** <#437062563620978708>
 Here you can ask for help with coding problems, bugs, and general questions.
 
-🖥️ **Replit Help~~**
+🖥️ **Replit Help~~** <#903018192962748456>
 Here you can ask for help with how to use Replit, and any problems you might run into using the service.
 
-🤖 **Bot Help~~**
+🤖 **Bot Help~~** <#903018261682212924>
 This is similar to *Code Help*, but is specific to asking for help with developing Discord bots or interacting the Discord API with various frameworks, like `discord.py` or `discord.js`.
 
 **Rules and Etiquette~~**
@@ -19,6 +19,6 @@ This is similar to *Code Help*, but is specific to asking for help with developi
 
 **Requesting Help~~**
 
-If you'd like to get help with a general question, head to the right topic channel and ask there. If you'd like help with a more complex problem, you can request a thread by reacting to this message, and I'll walk you through finding help! 
+If you'd like to get help with a general question, head to the right topic channel and ask there. If you'd like to recieve more direct help, open a help ticket by selecting a topic below and I will walk you through finding help!
 
 *Note that you can only create a thread once every 15 minutes. Abuse of this system will result in a blacklist as per moderator discretion.*
