@@ -6,8 +6,7 @@ from nextcord.ext import commands
 def _iter(i):
     return i if i else []
 
-
-def flat_check(iter, perms):
+def _flat_check(iter, perms):
     flat = [i.id for i in iter]
 
     for item in flat:
@@ -16,8 +15,7 @@ def flat_check(iter, perms):
 
     return False
 
-
-def load_perms_map(name: str):
+def _load_perms_map(name: str):
     path = f"source/cogs/{name.lower()}/config/perms.json"
 
     with open(path, "r+") as fh:
@@ -30,21 +28,22 @@ class Base(commands.Cog):
 
     async def cog_check(self, ctx):
         user, command = ctx.author, ctx.command
-        perms = load_perms_map(self.qualified_name)
+        spec = _load_perms_map(self.qualified_name)
 
-        spec = perms.get(command.name)
-        spec = spec if spec else perms["*"]
+        perms = spec.get(command.name)
+        perms = perms if perms else spec["*"]
 
-        if spec == "*":
+        if perms == "*":
             return True
-
-        if user.id in _iter(spec.get("members")):
+        
+        if user.id in _iter(perms.get("members")):
             return True
-
-        if flat_check(ctx.author.roles[1:], _iter(spec.get("roles"))):
-            return True
-
-        if flat_check(ctx.guild.channels, _iter(perms.get("channels"))):
+        
+        for role in _iter(perms.get("min_roles")):
+            if user.top_role >= ctx.guild.get_role(role):
+                return True 
+        
+        if ctx.channel.id in _iter(perms.get("channels")):
             return True
 
         return await ctx.message.add_reaction(r"❌") and False
