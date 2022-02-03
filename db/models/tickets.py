@@ -23,9 +23,13 @@ class Client(Model, ModelMixin):
 
     tickets = orm.relationship("Ticket", backref="client")
 
-    def blacklist(self, hrs: int):
+    def blacklist(self, hours: int=1, perma: bool=False):
         self.blacklisted = True
-        self.blacklisted_until = dt.datetime.now() + dt.timedelta(hours=hrs)
+        
+        if perma:
+            self.blacklisted_until = None
+        else:
+            self.blacklisted_until = dt.datetime.now() + dt.timedelta(hours=hours)
     
     def whitelist(self):
         self.blacklisted = False
@@ -45,7 +49,15 @@ class Client(Model, ModelMixin):
         delta = (abs(dt.datetime.now() - self.last_used) >= dt.timedelta(minutes=15))
 
         if self.blacklisted:
-            return False, "You have been blacklisted from opening tickets."
+            if self.blacklisted_until is None:
+                return False, "You have been permanantely blacklisted from opening tickets."
+            else:
+                if dt.datetime.now() < self.blacklisted_until:
+                    return (
+                        False,
+                        "You are blacklisted from opening tickets. "
+                        f"**{self.bl_delta() // 3600}** hours remaining."
+                    )
         
         if not delta:
             return False, "You can only open a thread once every 15 minutes!"
