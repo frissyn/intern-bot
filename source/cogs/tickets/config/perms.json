@@ -1,4 +1,22 @@
 {
     "*": {"members": [495609014886072320]},
-    "tickets.resolve": "*"
+    "tickets.force_resolve": {
+        "min_roles": [938616795223429130]
+    },
+    "tickets.resolve": "*",
+    "tickets.helper": {
+        "min_roles": [481953084726312977]
+    },
+    "tickets.whitelist": {
+        "min_roles": [903022622709792768]
+    },
+    "tickets.blacklist": {
+        "min_roles": [903022622709792768]
+    },
+    "tickets.permaban": {
+        "min_roles": [903022622709792768]
+    },
+    "tickets.unresolved": {
+        "min_roles": [903022622709792768]
+    }
 }

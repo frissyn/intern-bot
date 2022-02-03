@@ -1,10 +1,55 @@
 {
-    "description": "",
+    "descrip": "Manage and moderate help tickets/threads.",
     "type": "utility",
     "commands": {
-        "tickets.blacklist": {
-            "usage": "{cmd} {{user}}",
-            "brief": ""
+        "board": {
+            "hidden": [903022622709792768, 881414644814721044],
+            "usage": "tickets.board",
+            "brief": "Sends the info message with interactions for creating help threads.",
+            "args": {}
+        },
+        "blacklist": {
+            "hidden": [903022622709792768, 881414644814721044],
+            "usage": "tickets.blacklist [user] [hours]",
+            "brief": "Blacklist a user from creating new help tickets for x hours.",
+            "args": {
+                "user": "The user to be blacklisted.",
+                "hours": "The number of hours to blacklist the user for."
+            }
+        },
+        "force_allow": {
+            "hidden": [903022622709792768, 881414644814721044],
+            "usage": "tickets.force_allow [user]",
+            "brief": "Give a user permission to open a thread irrespective of time check or blacklist status.",
+            "args": {
+                "user": "The user to override permissions for." 
+            }
+        },
+        "permaban": {
+            "hidden": [903022622709792768, 881414644814721044],
+            "usage": "tickes.permaban [user]",
+            "brief": "**Permanently** blacklist a user from creating new help tickets.",
+            "args": {}
+        },
+        "resolve": {
+            "hidden": [],
+            "usage": "tickets.resolve",
+            "brief": "Mark your opened ticket as resolved. Must be used in the help thread.",
+            "args": []
+        },
+        "whitelist": {
+            "hidden": [903022622709792768, 881414644814721044],
+            "usage": "tickets.whitelist [user]",
+            "brief": "Whitelist an already blacklisted user.",
+            "args": {
+                "user": "The user to be whitelisted."   
+            }
+        },
+        "unresolved": {
+            "hidden": [903022622709792768, 881414644814721044],
+            "usage": "tickets.unresolved",
+            "brief": "Get an exhaustive list of all currently open help tickets.",
+            "args": {}
         }
     }
 }
