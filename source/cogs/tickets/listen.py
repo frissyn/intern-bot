@@ -4,9 +4,9 @@ import nextcord
 from db import session
 from db.models import Ticket
 
+from source import robot
 from source.cogs.cog import Base
 
-from nextcord.ext import tasks
 from nextcord.ext import commands
 
 from .utility import TARGET
@@ -21,38 +21,17 @@ TEST = "xxx users are currently in this help thread."
 
 
 class TicketsEvents(Base):
-    async def ticket_notice(self, thread_id: int):
-        ticket = session.query(Ticket).filter_by(thread_id=thread_id).first()
+    # @commands.Cog.listener()
+    # async def on_ready(self):
+    #     v = HelpBoard(self.bot)
 
-        if not ticket: return None
-        if not ticket.notice_id: return None
+    #     self.bot.add_view(v)
 
-        target = self.bot.get_channel(TARGET)
-        m = await target.fetch_message(ticket.notice_id)
+    #     for t in session.query(Ticket).all():
+    #         self.bot.add_view(JoinThreadView(t, self.bot))
 
-        return m
-    
-    async def increment_notice(self, msg: nextcord.Message, count):
-        em = msg.embeds[0]
-        num = re.findall(r"\d+", em.description)[0]
-        em.description = (
-            em.description[:len(TEST)] +
-            em.description[len(TEST):].replace(num, str(int(num) + count))
-        )
-
-        await msg.edit(embed=em)
-
-    @commands.Cog.listener()
-    async def on_ready(self):
-        v = HelpBoard(self.bot)
-
-        self.bot.add_view(v)
-
-        for t in session.query(Ticket).all():
-            self.bot.add_view(JoinThreadView(t, self.bot))
-
-            if not t.resolved:
-                self.bot.add_view(CategoryDropdownView(t, v))
+    #         if not t.resolved:
+    #             self.bot.add_view(CategoryDropdownView(t, v))
 
     @commands.Cog.listener()
     async def on_thread_member_join(self, member):
@@ -68,19 +47,31 @@ class TicketsEvents(Base):
         if not m: return
         await self.increment_notice(m, -1)
 
-    @tasks.loop(seconds=float(60*5))
-    async def notice_check(self):
-        tickets = session.query(Ticket).filter_by(resolved=False)
+    @commands.Cog.listener()
+    async def on_message(self, msg):
+        if msg.channel.id == TARGET:
+            if msg.is_system():
+                await msg.delete(delay=5)
 
-        for t in tickets:
-            thread = self.bot.get_channel(t.thread_id)
+    async def ticket_notice(self, thread_id: int):
+        ticket = session.query(Ticket).filter_by(thread_id=thread_id).first()
 
-            if thread.archived:
-                m = await self.ticket_notice(t.id)
+        if not ticket: return None
+        if not ticket.notice_id: return None
 
-                if m:
-                    await m.edit(view=ResolvedThreadView())
+        target = self.bot.get_channel(TARGET)
+        m = await target.fetch_message(ticket.notice_id)
+
+        return m
     
-    @notice_check.before_loop
-    async def before_notice_check(self):
-        await self.bot.wait_until_ready()
+    async def increment_notice(self, msg: nextcord.Message, count):
+        em = msg.embeds[0]
+        limit = len(em.description) - len(TEST)
+        num = re.findall(r"\d+", em.description[limit:])[0]
+
+        em.description = (
+            em.description[:limit] +
+            em.description[limit:].replace(num, str(int(num) + count))
+        )
+
+        await msg.edit(embed=em)

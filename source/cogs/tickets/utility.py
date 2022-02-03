@@ -7,7 +7,9 @@ from db.models import Context
 from db.utility import commit
 
 
-TARGET = 938094149222158376
+TARGET = 938840762878152725
+HELPER = 938616795223429130
+LOYAL = 481953084726312977
 ROLES = [
     {"value": "help-bash", "default": False, "label": "Bash"},
     {"value": "help-basic-lang", "default": False, "label": "Basic (Lang)"},
