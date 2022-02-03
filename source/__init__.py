@@ -13,12 +13,14 @@ extensions = {
     "cogs": [
         "clashes",
         "dump",
+        "help",
         "sandbox",
         "tickets",
         "utility"
     ],
 }
 
+robot.remove_command("help")
 
 for key, values in extensions.items():
     for target in values:
