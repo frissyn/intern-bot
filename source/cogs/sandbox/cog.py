@@ -12,7 +12,9 @@ from nextcord.ext import commands
 
 class Sandbox(Base):
     def _prep(self, code: str):
-        arr = code.strip("```").replace("py\n", "").replace("python\n", "").split("\n")
+        code = code.replace("-s\n", "", 1)
+
+        arr = code.strip("```").replace("py\n", "").split("\n")
 
         if not arr[::-1][0].replace(" ", "").startswith("return"):
             arr[len(arr) - 1] = "return " + arr[::-1][0]
@@ -26,10 +28,10 @@ class Sandbox(Base):
             if vlen > 100 and not isinstance(var, str):
                 return f"<{type(var).__name__} iterable with >= 100 values ({vlen})>"
             elif not vlen:
-                return f"<An empty {type(var).__name__} iterable>"
+                return f"<empty {type(var).__name__} iterable>"
 
         if not var and not isinstance(var, bool):
-            return f"<an empty {type(var).__name__} object>"
+            return f"<empty {type(var).__name__} object>"
 
         return var
 
@@ -52,7 +54,9 @@ class Sandbox(Base):
         return response
 
     @commands.command("sandbox.play")
-    async def _eval(self, ctx, *, code: str):
+    async def sandbox_play(self, ctx, *, code: str):
+        silent = "-s" in code
+
         code = self._prep(code)
 
         try:
@@ -63,6 +67,25 @@ class Sandbox(Base):
             else:
                 final = self._resolve(result)
 
-            await ctx.send(f"```py\n{final}\n```")
+            if not silent:
+                await ctx.send(f"```py\n{final}\n```")
         except Exception as e:
-            await ctx.send(f"Error:```\n{type(e).__name__}: {str(e)}```")
+            await ctx.send(f"```\n{type(e).__name__}: {str(e)}```")
+
+    @commands.command("sandbox.spec")
+    async def sandbox_spec(self, ctx, path, name="None", lines=None):
+        space = __import__(path, fromlist=[""])
+
+        if name == "None":
+            spec = inspect.getsource(space)
+        else:
+            spec = inspect.getsource(getattr(space, name, 404))
+                
+        if lines:
+            start, end = [int(n) for n in lines.split("-")[:2]]
+            spec = "\n".join(spec.split("\n")[start:end])
+
+        if len(spec) <= 3985:
+            await ctx.send(f"```py\n{spec}\n```")
+        else:
+            await ctx.send(f"```txt\nResult is >= 4000 characters.\n```")

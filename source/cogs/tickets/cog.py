@@ -7,19 +7,16 @@ from nextcord.ext import commands
 
 from db import session
 from db.models import Ticket
-from db.models import Client
-from db.models import Context
-
-from .views import HelpBoard
-from .views import JoinThreadView
-from .views import ResolvedThreadView
-from .views import CategoryDropdownView
 
 from .utility import LOYAL
 from .utility import TARGET
 from .utility import HELPER
 from .utility import make_client
 from .utility import file_content
+
+from .views.ticket import HelpBoardView
+from .views.misc import HelpRoleSelectView
+from .views.misc import ResolvedThreadView
 
 
 class Snowflake_(object):
@@ -28,15 +25,15 @@ class Snowflake_(object):
 
 
 class Tickets(Base):
-    @commands.command("tickets.board")
+    @commands.command("tickets.board", aliases=["board"])
     async def tickets_board(self, ctx):
         c = file_content("board")
         em = nextcord.Embed(color=COLOR, description=c, title=r"📜 **HELP BOARD**")
         
-        await ctx.send(embed=em, view=HelpBoard(self.bot))
+        await ctx.send(embed=em, view=HelpBoardView(self.bot))
 
     @commands.command("tickets.blacklist", aliases=["tbl"])
-    async def tickets_blacklist(self, ctx, mem: nextcord.Member, duration: int):
+    async def tickets_blacklist(self, ctx, mem: nextcord.Member, duration: int, *, reason: str):
         c = make_client(mem.id)
 
         if c.blacklisted:
@@ -50,8 +47,10 @@ class Tickets(Base):
 
         await ctx.send(
             f"**{mem.name}** has been blacklisted from creating new help "
-            f"threads for **{duration}** hours."
+            f"threads for **{duration}** hours. Reason: *{reason}*"
         )
+
+        await self.bot.cogs["TicketsEvents"].on_blacklist(mem, duration, reason)
     
     @commands.command("tickets.helper")
     async def tickets_helper(self, ctx):
@@ -67,7 +66,7 @@ class Tickets(Base):
         await ctx.message.add_reaction("👍")
     
     @commands.command("tickets.permaban", aliases=["tban"])
-    async def tickets_permaban(self, ctx, mem: nextcord.Member):
+    async def tickets_permaban(self, ctx, mem: nextcord.Member, *, reason: str):
         c = make_client(mem.id)
 
         c.blacklist(hours=0, perma=True)
@@ -75,8 +74,10 @@ class Tickets(Base):
 
         await ctx.send(
             f"**{mem.name}** has been permanantely blacklisted from "
-            "creating new help threads."
+            f"creating new help threads. Reason: *{reason}*"
         )
+
+        await self.bot.cogs["TicketsEvents"].on_permaban(mem, None, reason)
     
     @commands.command("tickets.resolve", aliases=["resolve"])
     async def tickets_resolve(self, ctx):
@@ -84,7 +85,7 @@ class Tickets(Base):
         ticket = session.query(Ticket).filter_by(thread_id=ctx.channel.id).first()
 
         if not ticket: return
-        if ticket.client_id != c.user_id: return
+        if ticket.client_id != c.id: return
 
         ticket.resolve()
         session.commit()
@@ -158,3 +159,30 @@ class Tickets(Base):
             em.description += f"437048931827056642/{t.thread_id}/{t.notice_id})\n"
         
         await ctx.send(embed=em)
+
+    @commands.command("tickets.user", aliases=["tuser"])
+    async def tickets_user(self, ctx, mem: nextcord.Member):
+        c = make_client(mem.id)
+
+        em = nextcord.Embed(color=COLOR)
+        em.title = f"**{mem.name}**'s Help Profile"
+        em.description = f"**Tickets Opened:** {len(c.tickets)}\n"
+        em.description += f"**Is blacklisted?:** {c.blacklisted}"
+
+        if len(c.tickets) > 0:
+            em.description += "\n\n**Previous Threads:**\n"
+
+            for t in c.tickets:
+                r = ("un" if not t.resolved else "") + "resolved"
+
+                em.description += f"**{t.type_}**: <#{t.thread_id}> - {r} - {t.ago()}"
+        
+        await ctx.send(embed=em)
+
+    @commands.command("tickets.rolemenu")
+    async def tickets_role_menu(self, ctx):
+        await ctx.send(
+            "Are you well versed in a topic or programming language?\n"
+            "Pick up a help role or two to be notified when someone "
+            "has a question you can answer!", view=HelpRoleSelectView(self.bot)
+        )

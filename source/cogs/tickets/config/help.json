@@ -10,11 +10,12 @@
         },
         "blacklist": {
             "hidden": [903022622709792768, 881414644814721044],
-            "usage": "tickets.blacklist [user] [hours]",
+            "usage": "tickets.blacklist [user] [hours] [reason]",
             "brief": "Blacklist a user from creating new help tickets for x hours.",
             "args": {
                 "user": "The user to be blacklisted.",
-                "hours": "The number of hours to blacklist the user for."
+                "hours": "The number of hours to blacklist the user for.",
+                "reason": "The reason for the ban."
             }
         },
         "force_allow": {
@@ -25,17 +26,26 @@
                 "user": "The user to override permissions for." 
             }
         },
+        "force_resolve": {
+            "hidden": [938616795223429130, 881414644814721044],
+            "usage": "tickets.force_resolve",
+            "brief": "Force the current ticket to be resolved and close the current thread.",
+            "args": {}
+        },
         "permaban": {
             "hidden": [903022622709792768, 881414644814721044],
-            "usage": "tickes.permaban [user]",
-            "brief": "**Permanently** blacklist a user from creating new help tickets.",
-            "args": {}
+            "usage": "tickes.permaban [user] [reason]",
+            "brief": "Permanently blacklist a user from creating new help tickets.",
+            "args": {
+                "user": "The user to ban.",
+                "reason": "The reason for the ban."
+            }
         },
         "resolve": {
             "hidden": [],
-            "usage": "tickets.resolve",
+            "usage": "resolve",
             "brief": "Mark your opened ticket as resolved. Must be used in the help thread.",
-            "args": []
+            "args": {}
         },
         "whitelist": {
             "hidden": [903022622709792768, 881414644814721044],
@@ -50,6 +60,14 @@
             "usage": "tickets.unresolved",
             "brief": "Get an exhaustive list of all currently open help tickets.",
             "args": {}
+        },
+        "user": {
+            "hidden": [903022622709792768, 881414644814721044],
+            "usage": "tickets.user [user]",
+            "brief": "Get a user's help profile and ticket history.",
+            "args": {
+                "user": "The user to search for."
+            }
         }
     }
 }

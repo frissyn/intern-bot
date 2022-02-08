@@ -1,57 +1,71 @@
-import re
 import nextcord
 
 from db import session
 from db.models import Ticket
 
-from source import robot
+from source import COLOR
 from source.cogs.cog import Base
 
 from nextcord.ext import commands
 
 from .utility import TARGET
-
-from .views import HelpBoard
-from .views import JoinThreadView
-from .views import ResolvedThreadView
-from .views import CategoryDropdownView
-
-
-TEST = "xxx users are currently in this help thread."
+from .utility import LOGGER
+from .utility import increment_notice
 
 
 class TicketsEvents(Base):
-    # @commands.Cog.listener()
-    # async def on_ready(self):
-    #     v = HelpBoard(self.bot)
-
-    #     self.bot.add_view(v)
-
-    #     for t in session.query(Ticket).all():
-    #         self.bot.add_view(JoinThreadView(t, self.bot))
-
-    #         if not t.resolved:
-    #             self.bot.add_view(CategoryDropdownView(t, v))
-
     @commands.Cog.listener()
     async def on_thread_member_join(self, member):
         m = await self.ticket_notice(member.thread_id)
 
         if not m: return
-        await self.increment_notice(m, 1)
+        await increment_notice(m, 1)
 
     @commands.Cog.listener()
     async def on_thread_member_remove(self, member):
         m = await self.ticket_notice(member.thread_id)
 
         if not m: return
-        await self.increment_notice(m, -1)
+        await increment_notice(m, -1)
 
     @commands.Cog.listener()
     async def on_message(self, msg):
         if msg.channel.id == TARGET:
             if msg.is_system():
                 await msg.delete(delay=5)
+    
+    async def on_blacklist(self, mem, duration, reason):
+        for c in LOGGER:
+            target = self.bot.get_channel(c)
+
+            if not duration:
+                descrip = (
+                    f"**{mem.name}** has been permantely blacklisted from "
+                    f"creating new help tickets. \n\n**Reason:** *{reason}*"
+                )
+            else:
+                descrip = (
+                    f"**{mem.name}** has been blacklisted from creating new "
+                    f"help tickets for **{duration}** hours. \n\n**Reason:** *{reason}*"
+                )
+
+            await target.send(
+                f"<@{mem.id}>",
+                embed=nextcord.Embed(color=COLOR, title="Help Thread Blacklist", description=descrip),
+                allowed_mentions=nextcord.AllowedMentions.all()
+            )
+    
+    
+    async def on_ticket_create(self, user, ticket):
+        target = self.bot.get_channel(LOGGER[0])
+
+        em = nextcord.Embed(title="New Ticket Created", color=COLOR)
+        em.description = f"**Client:** {user.mention}\n"
+        em.description += f"**Type:** {ticket.type_}\n"
+        em.description += f"**Thread:** <#{ticket.thread_id}>"
+        em.set_footer(text=f"Ticket ID: {ticket.f_id()} | Opened: {ticket.stamp}")
+
+        await target.send(embed=em)
 
     async def ticket_notice(self, thread_id: int):
         ticket = session.query(Ticket).filter_by(thread_id=thread_id).first()
@@ -63,15 +77,3 @@ class TicketsEvents(Base):
         m = await target.fetch_message(ticket.notice_id)
 
         return m
-    
-    async def increment_notice(self, msg: nextcord.Message, count):
-        em = msg.embeds[0]
-        limit = len(em.description) - len(TEST)
-        num = re.findall(r"\d+", em.description[limit:])[0]
-
-        em.description = (
-            em.description[:limit] +
-            em.description[limit:].replace(num, str(int(num) + count))
-        )
-
-        await msg.edit(embed=em)

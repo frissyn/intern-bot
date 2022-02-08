@@ -1,9 +1,44 @@
 {
-    "descrip": "",
-    "type": "recreation",
+    "descrip": "View classic shitposts from the Replit community, collectively called The Dumpster",
+    "type": "fun & recreation",
     "commands": {
-        "dump.random": {
-            
+        "random": {
+            "hidden": [],
+            "usage": "dump.random [seed]",
+            "brief": "Get a random post in the dumpster",
+            "args": {
+                "seed": "(optional) An integer to seed the random generator with."
+            }
+        },
+        "tag": {
+            "hidden": [],
+            "usage": "dump.tag [name]",
+            "brief": "Search a list of entries by tag name",
+            "args": {
+                "name": "Name of the tag to search for."
+            }
+        },
+        "dive": {
+            "hidden": [],
+            "usage": "dump.dive [name]",
+            "brief": "Find an entry in the dumpster that best matches the given name.",
+            "args": {
+                "name": "Name of the entry to search for."
+            }
+        },
+        "sdive": {
+            "hidden": [],
+            "usage": "dump.sdive [name]",
+            "brief": "The same functionality as `dump.dive`, but returns only the image.",
+            "args": {
+                "name": "Name of the entry to search for."
+            }
+        },
+        "count": {
+            "hidden": [],
+            "usage": "dump.count",
+            "brief": "Get the number of entries in the dumpster.",
+            "args": {}
         }
     }
 }

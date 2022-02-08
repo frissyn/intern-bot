@@ -1,3 +1,4 @@
+import timeago
 import datetime as dt
 import sqlalchemy as sq
 
@@ -90,8 +91,12 @@ class Ticket(Model, ModelMixin):
         return str(self.id).zfill(4)
 
     def resolve(self):
+        self.archived = True
         self.resolved = True
         self.resolved_at = dt.datetime.now()
+    
+    def ago(self):
+        return timeago.format(self.stamp, dt.datetime.now())
 
 
 class Context(Model, ModelMixin):

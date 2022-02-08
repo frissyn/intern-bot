@@ -86,13 +86,13 @@ class Dump(Base):
 
         return en
 
-    @commands.command(name="dump.count", aliases=["dump.c"])
+    @commands.command(name="dump.count", aliases=["dump.c", "dc"])
     async def count(self, ctx):
         c = session.query(DumpEntry).count()
 
         await ctx.send(f"There are currently {c} entries in the Dumpster.")
 
-    @commands.command(name="dump.add", aliases=["dump.a"])
+    @commands.command(name="dump.add", aliases=["dump.a", "da"])
     async def add(self, ctx, name, *, tags=""):
         target = self.bot.get_channel(self.target)
         a = (
@@ -107,7 +107,7 @@ class Dump(Base):
         await ctx.send(embed=self._embed_entry(entry))
         await ctx.message.delete()
 
-    @commands.command(name="quiet-add", aliases=["dump.qa"])
+    @commands.command(name="quiet-add", aliases=["dump.qa", "dqa"])
     async def qadd(self, ctx, name, *, tags=""):
         target = self.bot.get_channel(self.target)
         a = (
@@ -120,21 +120,21 @@ class Dump(Base):
         await self._new_entry(name, a, tags.split(" "))
         await ctx.message.add_reaction("🟢")
 
-    @commands.command(name="dump.dive", aliases=["dump.d"])
+    @commands.command(name="dump.dive", aliases=["dump.d", "dd"])
     async def search(self, ctx, name):
         en = self._find(name)
 
         if en:
             await ctx.send(embed=self._embed_entry(en))
 
-    @commands.command(name="dump.sdive", aliases=["dump.sd"])
+    @commands.command(name="dump.sdive", aliases=["dump.sd", "dsd"])
     async def slient_search(self, ctx, name):
         en = self._find(name)
 
         if en:
             await ctx.send(en.atch.url)
 
-    @commands.command(name="dump.random", aliases=["dump.r"])
+    @commands.command(name="dump.random", aliases=["dump.r", "dr"])
     async def random_(self, ctx, seed=None):
         random.seed(None, 2)
 
@@ -143,7 +143,7 @@ class Dump(Base):
 
         await ctx.send(embed=self._embed_entry(entry))
 
-    @commands.command(name="dump.tag", aliases=["dump.t"])
+    @commands.command(name="dump.tag", aliases=["dump.t", "dt"])
     async def tag(self, ctx, tag: str):
         tags = session.query(Tag).filter(Tag.name == tag).all()
         entries = [session.query(DumpEntry).get(t.entry_id) for t in tags]

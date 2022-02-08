@@ -1,15 +1,18 @@
+import re
+import nextcord
+
 from os import path
 
 from db import session
-from db.models import Ticket
 from db.models import Client
-from db.models import Context
 from db.utility import commit
 
 
 TARGET = 938840762878152725
 HELPER = 938616795223429130
 LOYAL = 481953084726312977
+LOGGER = [938545742295998514]
+TEST = "xxx users are currently in this help thread."
 ROLES = [
     {"value": "help-bash", "default": False, "label": "Bash"},
     {"value": "help-basic-lang", "default": False, "label": "Basic (Lang)"},
@@ -23,6 +26,7 @@ ROLES = [
     {"value": "help-js", "default": False, "label": "JavaScript"},
     {"value": "help-misc", "default": False, "label": "Miscellaneous"},
     {"value": "help-mongo", "default": False, "label": "Mongo"},
+    {"value": "help-nix", "default": False, "label": "Nix"},
     {"value": "help-php", "default": False, "label": "PHP"},
     {"value": "help-python", "default": False, "label": "Python"},
     {"value": "help-ruby", "default": False, "label": "Ruby"},
@@ -47,3 +51,16 @@ def file_content(name: str):
         content = fh.read()
 
     return content
+
+
+async def increment_notice(msg: nextcord.Message, count):
+    em = msg.embeds[0]
+    limit = len(em.description) - len(TEST)
+    num = re.findall(r"\d+", em.description[limit:])[0]
+
+    em.description = (
+        em.description[:limit] +
+        em.description[limit:].replace(num, str(int(num) + count))
+    )
+
+    await msg.edit(embed=em)

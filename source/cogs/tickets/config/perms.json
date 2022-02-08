@@ -18,5 +18,8 @@
     },
     "tickets.unresolved": {
         "min_roles": [903022622709792768]
+    },
+    "tickets.user": {
+        "min_roles": [481953084726312977]
     }
 }

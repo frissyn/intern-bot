@@ -31,3 +31,6 @@ class ModelMixin():
             self.__setattr__(row, val)
 
         session.commit()
+
+    def add_self(self, s):
+        s.add(self)
